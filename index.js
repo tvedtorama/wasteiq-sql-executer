@@ -10,9 +10,9 @@ var parser = new ArgumentParser({
   description: 'Argparse example'
 });
 parser.addArgument(
-	[ '-w', '--webpack' ],
+	[ '-m', '--mock' ],
 	{
-		help: 'Build and refresh webpack bundle',
+		help: "Just print the sql, don't execute",
 		action: "storeTrue",
 		nargs: 0,
 	});
@@ -46,7 +46,7 @@ if (args["webpack"]) {
 const main = require(`./build/${serverApp}/main`)
 
 // Tried to make an IMain for this, to use in the implementation - but it turned out to be virtually impossible to find a referenceable type for app.
-main.default(app)
+main.default(app, args)
 
 const port = parseInt(process.env["port"] || "3000")
 

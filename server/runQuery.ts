@@ -1,3 +1,4 @@
+import * as memoize from 'lodash.memoize'
 import { Connection, TYPES, Request, ConnectionConfig } from 'tedious';
 
 const config: ConnectionConfig = {
@@ -9,27 +10,32 @@ const config: ConnectionConfig = {
 	}
 }
 
-const connection = new Connection(config);
+const startConnection: () => Promise<Connection> = memoize(async () => {
+	const connection = new Connection(config);
 
-connection.on('connect', function (err) {
-	if (err) {
-		console.log(err);
-	} else {
-		console.log('Connected');
+	const exitOnFailure = () => {
+		console.log("exiting due to lost or failed connection")
+		process.exit(1)
 	}
-});
+	// These are not really necessary, as the application will fail by the unhandled exception anyways.
+	connection.on('end', exitOnFailure)
+	connection.on('error', exitOnFailure)
+	return new Promise((acc, rej) => {
+		connection.on('connect', function (err) {
+			if (err) {
+				console.log(err);
+				rej(err)
+			} else {
+				console.log('Connected');
+				acc(connection)
+			}
+		});
+	})
+})
 
-const exitOnFailure = () => {
-	console.log("exiting due to lost or failed connection")
-	process.exit(1)
-}
-// These are not really necessary, as the application will fail by the unhandled exception anyways.
-connection.on('end', exitOnFailure)
-connection.on('error', exitOnFailure)
 
-
-export const runCommand = (cmd: { sql: string, params: { [index: string]: any } }) => {
-
+export const runCommand = async (cmd: { sql: string, params: { [index: string]: any } }) => {
+	const connection = await startConnection()
 
 	const result = new Promise<number>((acc, rej) => {
 		const request = new Request(
