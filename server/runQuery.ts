@@ -1,6 +1,4 @@
 import { Connection, TYPES, Request, ConnectionConfig } from 'tedious';
-import { ETIME } from 'constants';
-import { exists } from 'fs';
 
 const config: ConnectionConfig = {
 	userName: process.env.username,
