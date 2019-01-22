@@ -9,14 +9,18 @@ let start = (app: Express.Express, args) => {
 	app.use(bodyParser.urlencoded({limit: bodyParserLimit, extended: true, parameterLimit: 50000}));
 
 	app.post(/sql$/, async (req, res: Express.Response) => {
-		console.log(req.body)
+		const sqlThings = Array.isArray(req.body) ? req.body : [req.body]
+		console.log(sqlThings)
 		if (args["mock"]) {
 			res.sendStatus(200)
 		} else {
 			try {
-				const result = await runCommand(req.body)
+				for (const sqlSpec of sqlThings) {
+					const result = await runCommand(sqlSpec)
+				}
 				res.sendStatus(200)
 			} catch (err) {
+				console.error("Error running query", err)
 				// Note: the app will shut down on errors on the connection, never reaching here.
 				res.sendStatus(501)
 			}
