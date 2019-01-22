@@ -34,7 +34,7 @@ const startConnection: () => Promise<Connection> = memoize(async () => {
 })
 
 
-export const runCommand = async (cmd: { sql: string, params: { [index: string]: any } }) => {
+export const runCommand = async (cmd: { sql: string, values: { [index: string]: any } }) => {
 	const connection = await startConnection()
 
 	const result = new Promise<number>((acc, rej) => {
@@ -47,8 +47,8 @@ export const runCommand = async (cmd: { sql: string, params: { [index: string]: 
 					acc(rowCount)
 				}
 			});
-		for (const key of Object.keys(cmd.params)) {
-			const value = cmd.params[key]
+		for (const key of Object.keys(cmd.values)) {
+			const value = cmd.values[key]
 			// XML type does not work, uses nvvarchar anyways, which fortunately works.
 			const sqlServerType = typeof value === "string" ?
 				(value.indexOf("<") === 0 ? TYPES.NVarChar : TYPES.NVarChar) : TYPES.Numeric
@@ -58,5 +58,5 @@ export const runCommand = async (cmd: { sql: string, params: { [index: string]: 
 		// Execute SQL statement
 		connection.execSql(request);
 	})
-	return result
+	return await result
 }
