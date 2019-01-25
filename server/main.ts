@@ -10,7 +10,9 @@ let start = (app: Express.Express, args) => {
 
 	app.post(/sql$/, async (req, res: Express.Response) => {
 		const sqlThings = Array.isArray(req.body) ? req.body : [req.body]
-		console.log(sqlThings)
+		if (process.env.logQueries) {
+			console.log(sqlThings)
+		}
 		if (args["mock"]) {
 			res.sendStatus(200)
 		} else {
