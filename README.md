@@ -1,6 +1,12 @@
 # wasteiq-sql-executer
 
-### Configuration
+## Running
+```npm start```
+
+The `start` stcript builds and runs with source map support, not secessary in production - probably. 
+
+
+## Configuration
 
 You can use a .env file for development.
 
