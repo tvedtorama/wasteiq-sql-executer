@@ -6,7 +6,7 @@ const bodyParserLimit = process.env.BODY_PARSER_LIMIT || "50mb"
 
 let start = (app: Express.Express, args) => {
 	app.use(bodyParser.json({limit: bodyParserLimit}));
-	app.use(bodyParser.urlencoded({limit: bodyParserLimit, extended: true, parameterLimit: 50000}));
+	app.use(bodyParser.urlencoded({limit: bodyParserLimit, extended: true, parameterLimit: 50000000}));
 
 	app.post(/sql$/, async (req, res: Express.Response) => {
 		const sqlThings = Array.isArray(req.body) ? req.body : [req.body]
@@ -23,7 +23,7 @@ let start = (app: Express.Express, args) => {
 				res.sendStatus(200)
 			} catch (err) {
 				console.error("Error running query", err)
-				// Note: the app will shut down on errors on the connection, never reaching here.
+				// Note: the app will shut down on errors on the connection, never reaching here. (not so sure about that...)
 				res.sendStatus(501)
 			}
 		}
